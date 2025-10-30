@@ -5,6 +5,9 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  server: {
+    port: 3000,
+  },
   // Temporarily disable HTTPS to test if Advanced Protection blocks localhost HTTP
   // server: {
   //   https: true,
