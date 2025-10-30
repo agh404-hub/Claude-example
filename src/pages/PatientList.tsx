@@ -375,8 +375,9 @@ const PatientList: React.FC = () => {
                       <Link
                         to={`/patients/${patient.id}`}
                         className="btn-view-details inline-flex items-center px-4 py-2 text-sm font-medium rounded-md no-underline border-2 border-teal transition-all"
+                        style={{ backgroundColor: '#0D9488', color: '#FFFFFF', padding: '0.5rem 1rem', borderRadius: '0.375rem', textDecoration: 'none' }}
                       >
-                        View Details
+                        VIEW PATIENT DETAILS
                       </Link>
                     </td>
                   </tr>
