@@ -374,17 +374,26 @@ const PatientList: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <Link
                         to={`/patients/${patient.id}`}
-                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md transition-colors"
                         style={{
-                          backgroundColor: '#FF0000',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          padding: '0.5rem 1rem',
+                          backgroundColor: '#0D9488',
                           color: 'white',
-                          fontWeight: 'bold'
+                          fontSize: '0.875rem',
+                          fontWeight: '500',
+                          borderRadius: '0.375rem',
+                          textDecoration: 'none',
+                          border: '2px solid #0D9488',
+                          transition: 'all 0.2s'
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = '#CC0000';
+                          e.currentTarget.style.backgroundColor = '#0F766E';
+                          e.currentTarget.style.borderColor = '#0F766E';
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = '#FF0000';
+                          e.currentTarget.style.backgroundColor = '#0D9488';
+                          e.currentTarget.style.borderColor = '#0D9488';
                         }}
                       >
                         View Details
