@@ -11,13 +11,24 @@ const AGPChart: React.FC<AGPChartProps> = ({ data }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!svgRef.current || !containerRef.current || data.length === 0) return;
+    console.log('AGPChart useEffect triggered', {
+      hasSvgRef: !!svgRef.current,
+      hasContainerRef: !!containerRef.current,
+      dataLength: data.length,
+      sampleData: data.slice(0, 3)
+    });
+
+    if (!svgRef.current || !containerRef.current || data.length === 0) {
+      console.log('AGPChart early return - missing refs or empty data');
+      return;
+    }
 
     // Clear previous chart
     d3.select(svgRef.current).selectAll('*').remove();
 
     // Dimensions and margins
     const containerWidth = containerRef.current.offsetWidth;
+    console.log('Container width:', containerWidth);
     const margin = { top: 20, right: 30, bottom: 50, left: 60 };
     const width = containerWidth - margin.left - margin.right;
     const height = 400 - margin.top - margin.bottom;
@@ -274,7 +285,7 @@ const AGPChart: React.FC<AGPChartProps> = ({ data }) => {
         </div>
       </div>
 
-      <div ref={containerRef} className="relative">
+      <div ref={containerRef} className="relative w-full min-h-[400px]">
         <svg ref={svgRef}></svg>
       </div>
     </div>

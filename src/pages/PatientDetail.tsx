@@ -28,6 +28,14 @@ const PatientDetail: React.FC = () => {
         return;
       }
 
+      console.log('Patient data loaded:', {
+        patientId: data.patient.id,
+        patientName: data.patient.name,
+        agpDataLength: data.agpData.length,
+        glucoseReadingsLength: data.glucoseReadings.length,
+        sampleAgpData: data.agpData.slice(0, 3)
+      });
+
       setPatientData(data);
       setLoading(false);
     };
