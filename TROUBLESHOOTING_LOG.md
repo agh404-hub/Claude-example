@@ -57,12 +57,36 @@ The project uses **Tailwind CSS v4.1.16** but had v3-style configuration:
 - **Commit**: `8e3aefa` - Add visual test to verify code updates are reaching browser
 - **Result**: Dev server running successfully with no errors at http://localhost:5173/
 
+### Attempt 8: Discovered Build Cache Issue - Code Not Reaching Browser
+- **Critical Discovery**: User sees "View Details" but code says "🔥 TEST BUTTON 🔥"
+- **ROOT CAUSE**: Changes are NOT reaching the browser - build cache issue!
+- Actions taken:
+  1. Killed dev server completely
+  2. Cleared ALL Vite caches: `rm -rf node_modules/.vite dist .vite`
+  3. Rewrote button with proper Tailwind v4 classes: `bg-teal hover:bg-teal-dark`
+  4. Restarted dev server fresh
+  5. Instructed user to hard refresh browser (Ctrl+Shift+R)
+- **Commit**: `788fb41` - Fix button styling with proper Tailwind v4 classes after clearing cache
+- **Result**: FAILED - User still sees same issue (grey on hover, white text)
+
 ## Current Status
 
-**Dev Server**: ✅ Running successfully on http://localhost:5173/ with NO errors
+**Dev Server**: ✅ Running cleanly on http://localhost:5173/ (PID 2690, no zombies)
 **Last Update**: 2025-10-30
+**Browser Cache**: User performed hard refresh
+**Issue**: Changes still not reaching browser despite clearing all caches
 
-Still investigating whether the button styling is now working correctly in the browser.
+## 🚨 CRITICAL UNRESOLVED ISSUE
+
+Despite clearing all caches (Vite + Browser), code changes are STILL not reaching the browser.
+This suggests a deeper problem:
+- Possible browser extension interference
+- Service worker caching
+- Proxy/network caching
+- Browser running from wrong URL
+- React/Vite HMR (Hot Module Replacement) failing
+
+**PAUSED FOR NOW** - User requested to pause troubleshooting
 
 ## Solution Applied
 
