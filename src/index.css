@@ -20,12 +20,14 @@ body {
 
 /* Custom button styles */
 .btn-view-details {
-  background-color: #0D9488;
-  color: white;
+  background-color: #0D9488 !important;
+  color: white !important;
+  border-color: #0D9488 !important;
 }
 
 .btn-view-details:hover {
-  background-color: #0F766E;
+  background-color: #0F766E !important;
+  border-color: #0F766E !important;
 }
 
 /* Custom scrollbar */
