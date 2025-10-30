@@ -374,20 +374,9 @@ const PatientList: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <Link
                         to={`/patients/${patient.id}`}
-                        style={{
-                          display: 'inline-block',
-                          backgroundColor: '#0D9488',
-                          color: 'white',
-                          fontWeight: '600',
-                          padding: '0.75rem 1.5rem',
-                          borderRadius: '0.5rem',
-                          textDecoration: 'none',
-                          border: '3px solid red'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0F766E'}
-                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#0D9488'}
+                        className="inline-block bg-teal hover:bg-teal-dark text-white font-semibold px-6 py-3 rounded-lg transition-colors duration-200"
                       >
-                        🔥 TEST BUTTON 🔥
+                        View Details
                       </Link>
                     </td>
                   </tr>
