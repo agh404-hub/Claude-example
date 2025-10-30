@@ -38,11 +38,17 @@ The project uses **Tailwind CSS v4.1.16** but had v3-style configuration:
 - Changed to `bg-teal hover:bg-teal-dark` (from tailwind.config.js)
 - **Result**: FAILED (v4 doesn't read colors from config, only from @theme)
 
-### Attempt 5: Fix Tailwind v4 Config ✅ SOLUTION
+### Attempt 5: Fix Tailwind v4 Config
 - Removed v3-style `theme.extend.colors` from tailwind.config.js
 - Used `.btn-view-details` class with `!important` (already in CSS)
 - Restarted dev server to clear cache
-- **Result**: SHOULD WORK NOW (waiting for user confirmation)
+- **Result**: FAILED (button still invisible/light grey)
+
+### Attempt 6: React Inline Styles with Event Handlers
+- Used React `style={{...}}` prop with hardcoded colors
+- Added `onMouseEnter`/`onMouseLeave` for hover effects
+- Bypasses all CSS and Tailwind completely
+- **Result**: FAILED (no change, same issue)
 
 ## Solution Applied
 

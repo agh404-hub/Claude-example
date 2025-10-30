@@ -381,12 +381,13 @@ const PatientList: React.FC = () => {
                           fontWeight: '600',
                           padding: '0.75rem 1.5rem',
                           borderRadius: '0.5rem',
-                          textDecoration: 'none'
+                          textDecoration: 'none',
+                          border: '3px solid red'
                         }}
                         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0F766E'}
                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#0D9488'}
                       >
-                        View Details
+                        🔥 TEST BUTTON 🔥
                       </Link>
                     </td>
                   </tr>
