@@ -18,6 +18,16 @@ body {
   background-color: rgb(249 250 251);
 }
 
+/* Custom button styles */
+.btn-view-details {
+  background-color: #0D9488;
+  color: white;
+}
+
+.btn-view-details:hover {
+  background-color: #0F766E;
+}
+
 /* Custom scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
   width: 8px;
