@@ -376,14 +376,15 @@ const PatientList: React.FC = () => {
                         to={`/patients/${patient.id}`}
                         className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md transition-colors"
                         style={{
-                          backgroundColor: '#0D9488',
-                          color: 'white'
+                          backgroundColor: '#FF0000',
+                          color: 'white',
+                          fontWeight: 'bold'
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = '#0F766E';
+                          e.currentTarget.style.backgroundColor = '#CC0000';
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = '#0D9488';
+                          e.currentTarget.style.backgroundColor = '#FF0000';
                         }}
                       >
                         View Details
