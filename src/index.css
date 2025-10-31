@@ -5,9 +5,9 @@
   --color-primary: #475569;
   --color-primary-light: #64748b;
   --color-primary-dark: #334155;
-  --color-teal: #14B8A6;
-  --color-teal-light: #5EEAD4;
-  --color-teal-dark: #0D9488;
+  --color-teal: rgba(37, 150, 190, 1);
+  --color-teal-light: rgba(37, 150, 190, 0.7);
+  --color-teal-dark: rgba(37, 150, 190, 1);
   --color-safe: #10B981;
   --color-warning: #F59E0B;
   --color-critical: #EF4444;
@@ -20,14 +20,14 @@ body {
 
 /* Custom button styles */
 .btn-view-details {
-  background-color: #14B8A6 !important;
+  background-color: rgba(37, 150, 190, 1) !important;
   color: white !important;
-  border-color: #14B8A6 !important;
+  border-color: rgba(37, 150, 190, 1) !important;
 }
 
 .btn-view-details:hover {
-  background-color: #0D9488 !important;
-  border-color: #0D9488 !important;
+  background-color: rgba(37, 150, 190, 0.8) !important;
+  border-color: rgba(37, 150, 190, 0.8) !important;
 }
 
 /* Custom scrollbar */
