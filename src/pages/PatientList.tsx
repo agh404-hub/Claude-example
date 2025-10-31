@@ -374,9 +374,9 @@ const PatientList: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <Link
                         to={`/patients/${patient.id}`}
-                        className="inline-block bg-teal hover:bg-teal-dark text-white font-semibold px-6 py-3 rounded-lg transition-colors duration-200 border-8 border-red-500"
+                        className="btn-view-details inline-block text-white font-semibold px-6 py-3 rounded-lg transition-colors duration-200"
                       >
-                        🚨 TESTING 123 🚨
+                        View Details
                       </Link>
                     </td>
                   </tr>
