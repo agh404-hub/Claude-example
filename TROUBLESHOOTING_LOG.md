@@ -110,12 +110,31 @@ This rules out browser-specific issues and browser caching entirely.
 
 **THE REAL ISSUE**: Dev server simply wasn't running. All previous attempts failed because we were making changes to files while viewing a **dead server's cached page**.
 
+### Attempt 10: Port Changes and Dev Server Stopped (2025-10-31)
+**Issue**: User reported "This site can't be reached - localhost refused to connect"
+
+- **Investigation**:
+  1. Checked running processes: NO Vite/Node dev server running
+  2. Git log shows recent port changes:
+     - `9c30511` - Revert to original port 5173 configuration
+     - `6efdede` - Change dev server port from 5173 to 3000 for testing
+  3. Server stopped at some point (unclear if manual, crash, or session end)
+
+- **Actions Taken**:
+  1. Started dev server: `npm run dev`
+  2. Server started successfully in 275ms
+  3. Confirmed listening on http://localhost:5173/
+  4. Process running as PID 1751
+
+- **Status**: ⏳ Server running, waiting for user to verify page renders in browser tomorrow
+- **Commit**: No code changes made (only restarted server)
+
 ## Current Status
 
-**Dev Server**: ✅ Running on http://localhost:5173/ (PID 3036)
-**Last Update**: 2025-10-30 21:30 UTC
-**File Status**: Test changes applied (red border + test text)
-**Next Step**: User confirming test button appears in browser
+**Dev Server**: ✅ Running on http://localhost:5173/ (PID 1751)
+**Last Update**: 2025-10-31 06:44 UTC
+**File Status**: Server restarted, configuration back to port 5173
+**Next Step**: User to verify page renders correctly in browser tomorrow
 
 ## Solution Applied
 
