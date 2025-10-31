@@ -163,12 +163,53 @@ This rules out browser-specific issues and browser caching entirely.
 
 - **Status**: ✅ **RESOLVED** - Site accessible and working
 
+### Attempt 12: 🎯 LOCAL vs CLOUD Dev Server + Button Fix! (2025-10-31)
+**Issue**: Button still not visible/styled correctly even after port forwarding fixed
+
+- **Investigation Process**:
+  1. After fixing port forwarding, user could access site but button still had issues
+  2. Applied button fix using `.btn-view-details` CSS class with !important
+  3. Committed changes to git (commit `417739f`)
+  4. User still seeing same button issue in browser
+  5. **CRITICAL DISCOVERY**: User was running `npm run dev` in LOCAL PowerShell
+  6. I (Claude) was editing files in the CLOUD container
+  7. Changes were in cloud git repo, but NOT on user's local machine!
+
+- **🎯 ROOT CAUSE DISCOVERED**:
+  **USER RUNNING LOCAL DEV SERVER, BUT CLAUDE EDITING CLOUD FILES!**
+
+  - User's setup:
+    - Local PowerShell running `npm run dev` on local machine
+    - Local dev server serving files from local machine's file system
+    - Port forwarding connecting local dev server to browser
+  - Claude's edits:
+    - All file edits happening in cloud container
+    - Changes committed to git in cloud
+    - Local machine's files NOT updated automatically
+  - Result: User viewing OLD files from local machine, never seeing Claude's changes
+
+- **Solution**:
+  1. Stop local dev server in PowerShell (Ctrl+C)
+  2. Encountered merge conflict with `package-lock.json`
+  3. Discarded local package-lock.json changes: `git checkout package-lock.json`
+  4. Pull latest changes from cloud: `git pull origin claude/healthcare-provider-dashboard-011CUcMiLvNMeVp7JtxpqgJU`
+  5. Restart local dev server: `npm run dev`
+  6. Refresh browser - **BUTTON NOW VISIBLE WITH TEAL BACKGROUND!** ✅
+
+- **Commits Involved**:
+  - `417739f` - Fix View Details button styling with proper CSS class
+  - `9d512ca` - Document root cause: local PowerShell port forwarding required
+  - `1d989a4` - Revert vite config to original working state
+
+- **Status**: ✅ **FULLY RESOLVED** - Button visible and working correctly
+
 ## Current Status
 
-**Dev Server**: ✅ Running on http://localhost:5173/
-**Port Forwarding**: ✅ Local PowerShell process running
-**Last Update**: 2025-10-31 17:07 UTC
-**Status**: Fully operational - site accessible in browser
+**Dev Server**: ✅ Running locally via PowerShell on http://localhost:5173/
+**Port Forwarding**: ✅ Local PowerShell process running npm run dev
+**Button Styling**: ✅ Teal background, proper hover effect
+**Last Update**: 2025-10-31 17:26 UTC
+**Status**: ✅ FULLY OPERATIONAL - All issues resolved!
 
 ## Solution Applied
 
@@ -200,6 +241,21 @@ This rules out browser-specific issues and browser caching entirely.
 - If you see "connection refused" but dev server is running → check local port forwarding process
 - Closing PowerShell window = breaks port forwarding = browser can't connect
 - Solution: Restart dev server from local PowerShell to re-establish tunnel
+
+### 3. Local vs Cloud Dev Server - File Synchronization
+**CRITICAL: When user runs local dev server but Claude edits cloud files:**
+- User running `npm run dev` in local PowerShell = serving files from LOCAL machine
+- Claude editing files in CLOUD container = changes only in cloud
+- **Changes don't automatically sync!** Must use git to transfer changes
+- Workflow:
+  1. Claude makes changes and commits to cloud git repo
+  2. User must `git pull` on local machine to get changes
+  3. Local dev server must be restarted to serve updated files
+- Symptoms of this issue:
+  - Claude confirms files are changed but user doesn't see updates
+  - Changes visible in git log but not in browser
+  - File reads in cloud show new code, but browser shows old code
+- Solution: Always pull latest changes before/after Claude makes edits
 
 ---
 
