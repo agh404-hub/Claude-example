@@ -129,12 +129,46 @@ This rules out browser-specific issues and browser caching entirely.
 - **Status**: ⏳ Server running, waiting for user to verify page renders in browser tomorrow
 - **Commit**: No code changes made (only restarted server)
 
+### Attempt 11: 🎯 ROOT CAUSE IDENTIFIED - Local Port Forwarding Process! (2025-10-31)
+**Issue**: "Unable to connect - Firefox can't establish a connection to localhost:5173"
+
+- **Investigation Process**:
+  1. Dev server confirmed running in cloud container (PID 1770, port 5173)
+  2. Server responding correctly: `curl http://localhost:5173/` returns HTML ✅
+  3. Port confirmed listening: `lsof -i :5173` shows node process ✅
+  4. But browser can't connect to `localhost:5173` ❌
+  5. Initially tried changing vite config (host: '0.0.0.0') - **WRONG APPROACH**
+  6. Reverted changes back to original working config
+  7. Investigated git history - found same issue in commit 6efdede
+  8. Realized: Cloud container's localhost ≠ User's localhost
+
+- **🎯 ACTUAL ROOT CAUSE DISCOVERED**:
+  **LOCAL POWERSHELL PORT FORWARDING PROCESS WAS NOT RUNNING!**
+
+  - User is working via Claude Code web interface (cloud container)
+  - Dev server runs inside cloud container
+  - **Requires local PowerShell process to create port forwarding tunnel**
+  - When PowerShell window closed, tunnel broke
+  - Browser trying to access local machine's localhost:5173 (nothing there)
+  - Dev server is at cloud container's localhost:5173 (not accessible from outside)
+
+- **Solution**:
+  - User restarted dev server from local PowerShell
+  - Port forwarding tunnel re-established
+  - Site now accessible at http://localhost:5173/ ✅
+
+- **Commits Made During Investigation**:
+  - `b8a49ca` - Configure Vite dev server to bind to all network interfaces (REVERTED)
+  - `1d989a4` - Revert vite config to original working state
+
+- **Status**: ✅ **RESOLVED** - Site accessible and working
+
 ## Current Status
 
-**Dev Server**: ✅ Running on http://localhost:5173/ (PID 1751)
-**Last Update**: 2025-10-31 06:44 UTC
-**File Status**: Server restarted, configuration back to port 5173
-**Next Step**: User to verify page renders correctly in browser tomorrow
+**Dev Server**: ✅ Running on http://localhost:5173/
+**Port Forwarding**: ✅ Local PowerShell process running
+**Last Update**: 2025-10-31 17:07 UTC
+**Status**: Fully operational - site accessible in browser
 
 ## Solution Applied
 
@@ -150,13 +184,22 @@ This rules out browser-specific issues and browser caching entirely.
 ### Latest Commit:
 - `6ebca8a` - Fix button styling for Tailwind v4 compatibility
 
-## 🔑 KEY LESSON
+## 🔑 KEY LESSONS
 
-**ALWAYS CHECK TAILWIND VERSION FIRST!**
+### 1. Always Check Tailwind Version First
 - Run: `grep tailwindcss package.json`
 - If v4.x: Use `@theme` in CSS, minimal config
 - If v3.x: Use `tailwind.config.js` with `theme.extend.colors`
 - **Don't mix v3 and v4 approaches!**
+
+### 2. Claude Code Cloud Environment Requires Local Port Forwarding
+**CRITICAL: When using Claude Code web interface with cloud containers:**
+- Dev server runs inside cloud container
+- Browser accesses localhost on your local machine
+- **MUST have local PowerShell/terminal process running** to create port forwarding tunnel
+- If you see "connection refused" but dev server is running → check local port forwarding process
+- Closing PowerShell window = breaks port forwarding = browser can't connect
+- Solution: Restart dev server from local PowerShell to re-establish tunnel
 
 ---
 
