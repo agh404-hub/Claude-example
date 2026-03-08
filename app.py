@@ -185,9 +185,7 @@ def compute_stats(listings, sales):
     active  = [h for h in listings if h.get("status", "").lower() not in ("sold", "pending")]
     pending = [h for h in listings if h.get("status", "").lower() == "pending"]
     comps   = [h for h in sales if
-               h.get("beds") == MY_HOME["beds"] and
-               abs((h.get("baths") or 0) - MY_HOME["baths"]) <= 0.5 and
-               abs((h.get("sqft") or 0) - MY_HOME["sqft"]) <= 400 and
+               abs((h.get("sqft") or 0) - MY_HOME["sqft"]) <= 200 and
                (h.get("sqft") or 0) > 0]
 
     def avg(lst, key):
@@ -261,7 +259,7 @@ with tab1:
 
     st.divider()
 
-    st.subheader("2bd / 2ba Comparables · Like Mine")
+    st.subheader("Comparables · ~1,842 Sqft (±200)")
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("My Est. Value",    fmt(MY_HOME["estimatedValue"]))
     c2.metric("Comp Avg Sale",    fmt(stats["compAvgSale"]))
@@ -278,14 +276,12 @@ with tab2:
     if not using_real_data:
         st.warning("Showing sample data. Upload a Redfin 'For Sale' CSV in the sidebar to see real listings.")
 
-    filter_comps = st.toggle("Show 2bd/2ba Comps Only")
+    filter_comps = st.toggle("Show Sqft Comps Only (~1,842 sqft ±200)")
 
     listings = ACTIVE_LISTINGS
     if filter_comps:
         listings = [h for h in listings if
-                    h.get("beds") == MY_HOME["beds"] and
-                    abs((h.get("baths") or 0) - MY_HOME["baths"]) <= 0.5 and
-                    abs((h.get("sqft") or 0) - MY_HOME["sqft"]) <= 400 and
+                    abs((h.get("sqft") or 0) - MY_HOME["sqft"]) <= 200 and
                     (h.get("sqft") or 0) > 0]
 
     if not listings:
@@ -294,9 +290,8 @@ with tab2:
         cols = st.columns(3)
         for i, home in enumerate(listings):
             with cols[i % 3]:
-                is_comp = (home.get("beds") == MY_HOME["beds"] and
-                           home.get("baths") == MY_HOME["baths"] and
-                           abs((home.get("sqft") or 0) - MY_HOME["sqft"]) <= 200)
+                is_comp = (abs((home.get("sqft") or 0) - MY_HOME["sqft"]) <= 200 and
+                           (home.get("sqft") or 0) > 0)
                 status = home.get("status", "Active")
                 status_icon = "🟡" if status.lower() == "pending" else "🟢"
                 comp_badge  = " · 🔵 Comp" if is_comp else ""
