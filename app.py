@@ -76,18 +76,21 @@ def parse_redfin_csv(file):
         records = []
         for _, row in df.iterrows():
             def g(col, default=""):
-                return row.get(col, default)
+                val = row.get(col, default)
+                if pd.isna(val) if not isinstance(val, str) else False:
+                    return default
+                return val
 
             records.append({
                 "address":      str(g("ADDRESS", "Unknown")).split(",")[0].strip().title(),
-                "beds":         int(g("BEDS", 0) or 0),
+                "beds":         int(float(g("BEDS", 0) or 0)),
                 "baths":        float(g("BATHS", 0) or 0),
                 "sqft":         parse_money(g("SQUARE FEET", 0)),
-                "yearBuilt":    int(g("YEAR BUILT", 0) or 0),
+                "yearBuilt":    int(float(g("YEAR BUILT", 0) or 0)),
                 "listPrice":    parse_money(g("PRICE", 0)),
                 "salePrice":    parse_money(g("PRICE", 0)),
                 "pricePerSqft": parse_money(g("$/SQUARE FEET", 0)),
-                "daysOnMarket": int(g("DAYS ON MARKET", 0) or 0),
+                "daysOnMarket": int(float(g("DAYS ON MARKET", 0) or 0)),
                 "status":       str(g("STATUS", "Active")).strip().title(),
                 "saleDate":     str(g("SOLD DATE", "")).strip(),
                 "hasPool":      False,
