@@ -46,8 +46,10 @@ REDFIN_COL_MAP = {
 }
 
 def parse_money(val):
+    if val is None or str(val).strip() in ("", "nan", "N/A", "—", "-"):
+        return 0
     try:
-        return int(str(val).replace("$", "").replace(",", "").strip())
+        return int(float(str(val).replace("$", "").replace(",", "").strip()))
     except Exception:
         return 0
 
@@ -60,8 +62,12 @@ def parse_redfin_csv(file):
         # Find the header line (contains "ADDRESS")
         lines = raw.splitlines()
         header_idx = next((i for i, l in enumerate(lines) if "ADDRESS" in l.upper()), 0)
-        df = pd.read_csv(file, skiprows=header_idx)
+        df = pd.read_csv(file, skiprows=header_idx, dtype=str)
         df.columns = [c.strip().upper() for c in df.columns]
+
+        # Show detected columns in sidebar for debugging
+        with st.sidebar.expander("🔍 CSV columns detected", expanded=False):
+            st.write(list(df.columns))
 
         records = []
         for _, row in df.iterrows():
@@ -69,7 +75,15 @@ def parse_redfin_csv(file):
                 val = row.get(col, default)
                 if pd.isna(val) if not isinstance(val, str) else False:
                     return default
-                return val
+                v = str(val).strip()
+                return default if v in ("", "nan", "N/A") else v
+
+            # Redfin uses PRICE for active/pending list price AND sold price.
+            # Some exports also have SALE PRICE or CLOSE PRICE — try those first.
+            price_raw = (g("SALE PRICE") or g("CLOSE PRICE") or g("SOLD PRICE") or g("PRICE", "0"))
+            price = parse_money(price_raw)
+
+            status = str(g("STATUS", "Active")).strip().title()
 
             records.append({
                 "address":      str(g("ADDRESS", "Unknown")).split(",")[0].strip().title(),
@@ -77,11 +91,11 @@ def parse_redfin_csv(file):
                 "baths":        float(g("BATHS", 0) or 0),
                 "sqft":         parse_money(g("SQUARE FEET", 0)),
                 "yearBuilt":    int(float(g("YEAR BUILT", 0) or 0)),
-                "listPrice":    parse_money(g("PRICE", 0)),
-                "salePrice":    parse_money(g("PRICE", 0)),
+                "listPrice":    price,
+                "salePrice":    price if status.lower() == "sold" else 0,
                 "pricePerSqft": parse_money(g("$/SQUARE FEET", 0)),
                 "daysOnMarket": int(float(g("DAYS ON MARKET", 0) or 0)),
-                "status":       str(g("STATUS", "Active")).strip().title(),
+                "status":       status,
                 "saleDate":     str(g("SOLD DATE", "")).strip(),
                 "hasPool":      False,
                 "features":     "",
@@ -89,6 +103,8 @@ def parse_redfin_csv(file):
         return records
     except Exception as e:
         st.sidebar.error(f"Could not read CSV: {e}")
+        import traceback
+        st.sidebar.text(traceback.format_exc())
         return []
 
 # ── Load data ─────────────────────────────────────────────────────────────────
@@ -170,8 +186,9 @@ def compute_stats(listings, sales):
     pending = [h for h in listings if h.get("status", "").lower() == "pending"]
     comps   = [h for h in sales if
                h.get("beds") == MY_HOME["beds"] and
-               h.get("baths") == MY_HOME["baths"] and
-               abs((h.get("sqft") or 0) - MY_HOME["sqft"]) <= 200]
+               abs((h.get("baths") or 0) - MY_HOME["baths"]) <= 0.5 and
+               abs((h.get("sqft") or 0) - MY_HOME["sqft"]) <= 400 and
+               (h.get("sqft") or 0) > 0]
 
     def avg(lst, key):
         vals = [h[key] for h in lst if h.get(key)]
@@ -267,8 +284,9 @@ with tab2:
     if filter_comps:
         listings = [h for h in listings if
                     h.get("beds") == MY_HOME["beds"] and
-                    h.get("baths") == MY_HOME["baths"] and
-                    abs((h.get("sqft") or 0) - MY_HOME["sqft"]) <= 200]
+                    abs((h.get("baths") or 0) - MY_HOME["baths"]) <= 0.5 and
+                    abs((h.get("sqft") or 0) - MY_HOME["sqft"]) <= 400 and
+                    (h.get("sqft") or 0) > 0]
 
     if not listings:
         st.info("No listings match the current filter.")
