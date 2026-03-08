@@ -12,7 +12,7 @@ st.set_page_config(
 # ── Data ─────────────────────────────────────────────────────────────────────
 
 MY_HOME = {
-    "address": "Trilogy at the Vineyards, Brentwood CA 94513",
+    "address": "1678 Provence Ln, Trilogy at the Vineyards, Brentwood CA 94513",
     "beds": 2, "baths": 2, "sqft": 1842, "yearBuilt": 2006,
     "garage": 2, "hasPool": False,
     "estimatedValue": 685000,
