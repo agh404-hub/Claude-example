@@ -15,25 +15,15 @@ with st.sidebar:
     st.markdown("## 📥 Load Real Data from Redfin")
     st.markdown("---")
 
-    st.markdown("### Step 1 — Get Active Listings")
+    st.markdown("### How to Download")
     st.markdown(
         "1. Go to **[redfin.com](https://www.redfin.com/zipcode/94513)**\n"
         "2. Search: `Trilogy at the Vineyards Brentwood CA 94513`\n"
-        "3. Set status filter to **For Sale** (include Pending)\n"
+        "3. Set status filter to **All** (For Sale + Pending + Sold)\n"
         "4. Scroll down → click **☰ Download All**\n"
-        "5. Upload that CSV below:"
+        "5. Upload that single CSV below:"
     )
-    listings_file = st.file_uploader("For Sale CSV", type="csv", key="listings")
-
-    st.markdown("---")
-    st.markdown("### Step 2 — Get Recent Sales")
-    st.markdown(
-        "1. Same search on Redfin\n"
-        "2. Set status filter to **Sold** · last 6 months\n"
-        "3. Click **☰ Download All**\n"
-        "4. Upload that CSV below:"
-    )
-    sold_file = st.file_uploader("Sold Homes CSV", type="csv", key="sold")
+    combined_file = st.file_uploader("Redfin CSV (all statuses)", type="csv", key="combined")
 
     st.markdown("---")
     st.caption("Data stays in your browser session only. Re-upload anytime to refresh.")
@@ -103,8 +93,21 @@ def parse_redfin_csv(file):
 
 # ── Load data ─────────────────────────────────────────────────────────────────
 
-active_data = parse_redfin_csv(listings_file) if listings_file else []
-sold_data   = parse_redfin_csv(sold_file)     if sold_file   else []
+def split_by_status(records):
+    """Split a combined Redfin export into listings (active/pending) and sold."""
+    listings, sold = [], []
+    for r in records:
+        if r.get("status", "").lower() == "sold":
+            sold.append(r)
+        else:
+            listings.append(r)
+    return listings, sold
+
+if combined_file:
+    all_records = parse_redfin_csv(combined_file)
+    active_data, sold_data = split_by_status(all_records)
+else:
+    active_data, sold_data = [], []
 
 using_real_data = bool(active_data or sold_data)
 
