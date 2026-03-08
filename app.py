@@ -184,9 +184,7 @@ MY_HOME = {
 def compute_stats(listings, sales):
     active  = [h for h in listings if h.get("status", "").lower() not in ("sold", "pending")]
     pending = [h for h in listings if h.get("status", "").lower() == "pending"]
-    comps   = [h for h in sales if
-               abs((h.get("sqft") or 0) - MY_HOME["sqft"]) <= 200 and
-               (h.get("sqft") or 0) > 0]
+    comps   = [h for h in sales if h.get("sqft") == MY_HOME["sqft"]]
 
     def avg(lst, key):
         vals = [h[key] for h in lst if h.get(key)]
@@ -259,7 +257,7 @@ with tab1:
 
     st.divider()
 
-    st.subheader("Comparables · ~1,842 Sqft (±200)")
+    st.subheader("Comparables · 1,842 Sqft")
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("My Est. Value",    fmt(MY_HOME["estimatedValue"]))
     c2.metric("Comp Avg Sale",    fmt(stats["compAvgSale"]))
@@ -276,13 +274,11 @@ with tab2:
     if not using_real_data:
         st.warning("Showing sample data. Upload a Redfin 'For Sale' CSV in the sidebar to see real listings.")
 
-    filter_comps = st.toggle("Show Sqft Comps Only (~1,842 sqft ±200)")
+    filter_comps = st.toggle("Show 1,842 Sqft Comps Only")
 
     listings = ACTIVE_LISTINGS
     if filter_comps:
-        listings = [h for h in listings if
-                    abs((h.get("sqft") or 0) - MY_HOME["sqft"]) <= 200 and
-                    (h.get("sqft") or 0) > 0]
+        listings = [h for h in listings if h.get("sqft") == MY_HOME["sqft"]]
 
     if not listings:
         st.info("No listings match the current filter.")
@@ -290,8 +286,7 @@ with tab2:
         cols = st.columns(3)
         for i, home in enumerate(listings):
             with cols[i % 3]:
-                is_comp = (abs((home.get("sqft") or 0) - MY_HOME["sqft"]) <= 200 and
-                           (home.get("sqft") or 0) > 0)
+                is_comp = home.get("sqft") == MY_HOME["sqft"]
                 status = home.get("status", "Active")
                 status_icon = "🟡" if status.lower() == "pending" else "🟢"
                 comp_badge  = " · 🔵 Comp" if is_comp else ""
