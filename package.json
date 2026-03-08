@@ -12,6 +12,7 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.78.0",
     "@types/d3": "^7.4.3",
     "d3": "^7.9.0",
     "date-fns": "^4.1.0",
