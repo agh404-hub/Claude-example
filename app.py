@@ -170,13 +170,69 @@ RECENT_SALES    = sold_data   if sold_data   else SAMPLE_SALES
 
 # ── My Home ───────────────────────────────────────────────────────────────────
 
+MY_HOME_SQFT = 1842
+
+def estimate_value(sales, listings):
+    """Estimate home value from last-12-month comp sales + active comp list prices."""
+    from datetime import date, timedelta
+    cutoff = date.today() - timedelta(days=365)
+
+    def parse_date(s):
+        for fmt in ("%b %d, %Y", "%Y-%m-%d", "%m/%d/%Y", "%B %d, %Y"):
+            try:
+                return pd.to_datetime(s, format=fmt).date()
+            except Exception:
+                pass
+        try:
+            return pd.to_datetime(s).date()
+        except Exception:
+            return None
+
+    # 1. Last-12-month comp sales (exact sqft match)
+    recent_comps = [
+        h for h in sales
+        if h.get("sqft") == MY_HOME_SQFT
+        and h.get("salePrice", 0) > 0
+        and (parse_date(h.get("saleDate", "")) or date.min) >= cutoff
+    ]
+
+    sale_prices = sorted(h["salePrice"] for h in recent_comps)
+
+    if sale_prices:
+        n = len(sale_prices)
+        median = int((sale_prices[(n-1)//2] + sale_prices[n//2]) / 2)
+        low  = min(sale_prices)
+        high = max(sale_prices)
+        source = f"Median of {n} comp sale{'s' if n>1 else ''} (last 12 mo)"
+    else:
+        # Fallback: active comp list prices
+        active_comps = [
+            h for h in listings
+            if h.get("sqft") == MY_HOME_SQFT and h.get("listPrice", 0) > 0
+        ]
+        prices = sorted(h["listPrice"] for h in active_comps)
+        if prices:
+            n = len(prices)
+            median = int((prices[(n-1)//2] + prices[n//2]) / 2)
+            low  = min(prices)
+            high = max(prices)
+            source = f"Avg of {n} active comp list price{'s' if n>1 else ''} (no recent sales)"
+        else:
+            median, low, high = 685000, 655000, 715000
+            source = "Default estimate (no comp data found)"
+
+    return median, low, high, source
+
+est_value, est_low, est_high, est_source = estimate_value(RECENT_SALES, ACTIVE_LISTINGS)
+
 MY_HOME = {
     "address": "Trilogy at the Vineyards, Brentwood CA 94513",
-    "beds": 2, "baths": 2, "sqft": 1842, "yearBuilt": 2006,
+    "beds": 2, "baths": 2, "sqft": MY_HOME_SQFT, "yearBuilt": 2006,
     "garage": 2, "hasPool": False,
-    "estimatedValue": 685000,
-    "estimatedValueLow": 655000,
-    "estimatedValueHigh": 715000,
+    "estimatedValue":     est_value,
+    "estimatedValueLow":  est_low,
+    "estimatedValueHigh": est_high,
+    "estimatedValueSource": est_source,
 }
 
 # ── Computed stats ────────────────────────────────────────────────────────────
@@ -241,6 +297,7 @@ with tab1:
     with col2:
         st.metric("Estimated Value", fmt(MY_HOME["estimatedValue"]),
                   delta=f"Range: {fmt(MY_HOME['estimatedValueLow'])} – {fmt(MY_HOME['estimatedValueHigh'])}")
+        st.caption(MY_HOME["estimatedValueSource"])
     with col3:
         st.metric("Price per Sqft", f"${MY_HOME['estimatedValue'] // MY_HOME['sqft']}")
 
