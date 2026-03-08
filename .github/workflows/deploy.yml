@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, claude/home-sales-tracker-4Ik7H ]
   workflow_dispatch:
 
 permissions:
