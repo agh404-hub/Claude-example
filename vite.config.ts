@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/Claude-example/', // GitHub Pages base path
+  base: process.env.VITE_BASE_PATH ?? '/Claude-example/',
   // Temporarily disable HTTPS to test if Advanced Protection blocks localhost HTTP
   // server: {
   //   https: true,

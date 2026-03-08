@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main, claude/home-sales-tracker-4Ik7H ]
+    branches: [ main, master, claude/home-sales-tracker-4Ik7H ]
   workflow_dispatch:
 
 permissions:
@@ -18,20 +18,45 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout healthcare app (master)
         uses: actions/checkout@v4
+        with:
+          ref: master
+          path: healthcare
+
+      - name: Checkout home sales tracker
+        uses: actions/checkout@v4
+        with:
+          ref: claude/home-sales-tracker-4Ik7H
+          path: tracker
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install & build healthcare app
+        working-directory: healthcare
+        run: |
+          npm ci
+          npm run build
+        env:
+          VITE_BASE_PATH: /Claude-example/
 
-      - name: Build
-        run: npm run build
+      - name: Install & build home sales tracker
+        working-directory: tracker
+        run: |
+          npm ci
+          npm run build
+        env:
+          VITE_BASE_PATH: /Claude-example/tracker/
+
+      - name: Combine builds
+        run: |
+          mkdir -p combined
+          cp -r healthcare/dist/. combined/
+          mkdir -p combined/tracker
+          cp -r tracker/dist/. combined/tracker/
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -39,7 +64,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist'
+          path: combined/
 
   deploy:
     environment:
