@@ -370,21 +370,24 @@ with tab3:
         st.warning("Showing sample data. Upload a Redfin 'Sold' CSV in the sidebar to see real sales.")
 
     col1, col2, col3, col4 = st.columns(4)
-    col1.metric("2bd/2ba Avg Sale",   fmt(stats["compAvgSale"]))
-    col2.metric("2bd/2ba Avg $/Sqft", f"${stats['compAvgPpsf']}")
-    col3.metric("My Est. Value",       fmt(MY_HOME["estimatedValue"]))
-    col4.metric("Comp Avg DOM",        f"{stats['compAvgDOM']} days")
+    col1.metric("Comp Avg Sale",   fmt(stats["compAvgSale"]))
+    col2.metric("Comp Avg $/Sqft", f"${stats['compAvgPpsf']}")
+    col3.metric("My Est. Value",   fmt(MY_HOME["estimatedValue"]))
+    col4.metric("Comp Avg DOM",    f"{stats['compAvgDOM']} days")
 
     st.divider()
 
     if RECENT_SALES:
+        show_comps_only = st.toggle("Show 1,842 Sqft Comps Only", key="sales_comps")
+
         df_sales = pd.DataFrame(RECENT_SALES)
-        df_sales["Comp?"] = df_sales.apply(
-            lambda r: "✓" if (r.get("beds") == MY_HOME["beds"] and
-                              r.get("baths") == MY_HOME["baths"] and
-                              abs((r.get("sqft") or 0) - MY_HOME["sqft"]) <= 200) else "",
-            axis=1
+        df_sales["Comp?"] = df_sales["sqft"].apply(
+            lambda s: "✓" if s == MY_HOME["sqft"] else ""
         )
+
+        if show_comps_only:
+            df_sales = df_sales[df_sales["sqft"] == MY_HOME["sqft"]]
+
         df_sales["List Price"] = df_sales["listPrice"].apply(fmt)
         df_sales["Sale Price"] = df_sales["salePrice"].apply(fmt)
         df_sales["$/Sqft"]     = df_sales["pricePerSqft"].apply(lambda x: f"${x}")
@@ -393,14 +396,17 @@ with tab3:
         show_cols = ["address", "beds", "baths", "sqft", "List Price", "Sale Price", "$/Sqft", "DOM", "saleDate", "Comp?"]
         show_cols = [c for c in show_cols if c in df_sales.columns]
 
-        st.dataframe(
-            df_sales[show_cols].rename(columns={
-                "address": "Address", "beds": "Beds", "baths": "Baths",
-                "sqft": "Sqft", "saleDate": "Sale Date",
-            }),
-            use_container_width=True,
-            hide_index=True,
-        )
+        if df_sales.empty:
+            st.info("No 1,842 sqft sales found in this dataset.")
+        else:
+            st.dataframe(
+                df_sales[show_cols].rename(columns={
+                    "address": "Address", "beds": "Beds", "baths": "Baths",
+                    "sqft": "Sqft", "saleDate": "Sale Date",
+                }),
+                use_container_width=True,
+                hide_index=True,
+            )
     else:
         st.info("No sales data. Upload a Redfin 'Sold' CSV in the sidebar.")
 
